@@ -21,16 +21,16 @@ def gerarIdCensor(cidade):
 
 #criando função de gerar dados
 def gerarDados(cidade, id):
-    temperatura = round(random.uniform(5, 45), 1)
+    temperatura = round(random.uniform(-10, 45), 1)
     umidade = random.randint(40, 95)
     pressao = round(random.uniform(980, 1030), 1)
     return {
         "cidade_censor": cidade,
         "id_censor": id,
-        "data/hora": time.strftime("%y-%m-%d-%h:%m%s"),
+        "data/hora": time.strftime("%y-%m-%d-%H:%M%S"),
         "dados meteorológicos": {
             "temperatura, graus celsius": temperatura,
-            "Pressão_hpa": pressao,
+            "pressão_hpa": pressao,
             "umidade do ar, porcentagem": umidade
         }
     }
