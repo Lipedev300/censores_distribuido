@@ -1,5 +1,13 @@
 import socket
+import json
 
+#definição da função de análise de clima
+def analisarClima(dicionario):
+    temperatura = dicionario["dados meteorológicos"]["temperatura, graus celsius"]
+    umidade = dicionario["dados meteorológicos"]["umidade do ar, porcentagem"]
+    pressao = dicionario["dados meteorológicos"]["pressão_hpa"]
+}
+#configuração do servidor
 endereco = "127.0.0.1"
 porta = 13000
 
@@ -17,8 +25,9 @@ while True:
                 if not dados:
                     print("Cliente desconectou, sem mensagens")
                     break
-                mensagem = dados.decode("utf-8")
-                print("Mensagem do cliente: ", mensagem)
+                mensagem_cliente = dados.decode("utf-8")
+                censor_dict = json.loads(mensagem_cliente)
+                print("Dados do censor: ", censor_dict)
             except Exception as e:
                 #lidando com mensagens não recebidas ou algo assim
                 print("Mensagem não encontrada, erro de conexão")
