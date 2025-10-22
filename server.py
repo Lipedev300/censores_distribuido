@@ -1,5 +1,6 @@
 import socket
 import json
+import threading
 
 #definição da função de análise de clima
 def analisarClima(dicionario):
@@ -29,6 +30,29 @@ def analisarClima(dicionario):
         status += " | Clima muito úmido, tome cuidado com alimentos mofados e bactérias que podem se proliferar"
     return status
 
+#criação da função que lida com os dados co cliente
+def atenderCliente(conexaoCliente, enderecoCliente):
+    cidade = "desconhecido"
+    while True:
+        try:
+            dados = conexaoCliente.recv(1024)
+            if not dados:
+                print("Cliente desconectou, sem mensagens")
+                break
+            mensagem_cliente = dados.decode("utf-8")
+            censor_dict = json.loads(mensagem_cliente)
+            print("Dados do censor: \n", censor_dict)
+            cidade = censor_dict["cidade_censor"]
+            status_clima = analisarClima(censor_dict)
+            print("Com base na análise realizada, na cidade ", cidade, " o status sobre o clima aqui é: ", status_clima)
+            conexaoCliente.sendall(status_clima.encode("utf-8"))
+        except Exception as e:  
+            #lidando com mensagens não recebidas ou algo assim
+            print("Mensagem não encontrada, erro de conexão")
+            break
+    #fechando a conexão do cliente
+    conexaoCliente.close()
+
 #configuração do servidor
 endereco = "127.0.0.1"
 porta = 13000
@@ -41,24 +65,8 @@ while True:
     try:
         conexaoCliente, enderecoCliente = sock.accept()
         print("Cliente conectado!")
-        while True:
-            try:
-                dados = conexaoCliente.recv(1024)
-                if not dados:
-                    print("Cliente desconectou, sem mensagens")
-                    break
-                mensagem_cliente = dados.decode("utf-8")
-                censor_dict = json.loads(mensagem_cliente)
-                print("Dados do censor: \n", censor_dict)
-                cidade = censor_dict["cidade_censor"]
-                status_clima = analisarClima(censor_dict)
-                print("Com base na análise realizada, na cidade ", cidade, " o status sobre o clima aqui é: ", status_clima)
-            except Exception as e:  
-                #lidando com mensagens não recebidas ou algo assim
-                print("Mensagem não encontrada, erro de conexão")
-                break
-        #fechando a conexão do cliente
-        conexaoCliente.close()
+        atendimento = threading.Thread(target= atenderCliente, args= (conexaoCliente, enderecoCliente,))
+        atendimento.start()
     except KeyboardInterrupt:
         #lidando com o encerramento do servidor pelo usuário (ctrl+c)
         print("Servidor encerrado pelo usuário")

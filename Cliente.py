@@ -23,6 +23,10 @@ while True:
                     mensagem = json.dumps(dados)
                     s.sendall(mensagem.encode("utf-8"))
                     time.sleep(3)
+                    #recebendo resposta do servidor
+                    resposta = s.recv(1024)
+                    mensagem = resposta.decode("utf-8")
+                    print("Com base nos dados meteorológicos enviados, a análise de clima na cidade ", cidade_censor, " é: ", mensagem)
                 except Exception as e:
                     #lidando com erros ao enviar dados
                     print("Erro ao enviar dados, tente novamente. Mensagem: ", e)
